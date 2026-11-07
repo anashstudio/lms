@@ -1,0 +1,48 @@
+# ========================================================
+# پیکربندی سرور آپاچی و ریدایرکت برای هاست‌های لینوکس (cPanel / DirectAdmin)
+# ========================================================
+
+Options -Indexes
+ServerSignature Off
+
+AddDefaultCharset UTF-8
+DefaultLanguage fa
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
+<FilesMatch "^(config\.php|install\.lock|database\.sql|\.env)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# تنظیمات بهینه برای آپلود نامحدود ویدئو و فایل‌های حجیم روی هاست
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 2048M
+    php_value post_max_size 2048M
+    php_value memory_limit 512M
+    php_value max_execution_time 600
+</IfModule>
+<IfModule mod_php.c>
+    php_value upload_max_filesize 2048M
+    php_value post_max_size 2048M
+    php_value memory_limit 512M
+    php_value max_execution_time 600
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    RewriteRule ^ index.html [L]
+</IfModule>

@@ -1,0 +1,44 @@
+# ========================================================
+# پیکربندی سرور آپاچی و ریدایرکت برای هاست‌های لینوکس (cPanel / DirectAdmin)
+# ========================================================
+
+Options -Indexes
+ServerSignature Off
+
+# تنظیم انکودینگ پیش‌فرض UTF-8
+AddDefaultCharset UTF-8
+DefaultLanguage fa
+
+# فعال‌سازی فشرده‌سازی GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
+# حفاظت از فایل‌های حساس
+<FilesMatch "^(config\.php|install\.lock|database\.sql|\.env)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# مدیریت مسیرهای SPA و روت‌های سامانه
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # اگر درخواست به install.php یا api.php یا فایلی فیزیکی بود، مستقیم اجرا شود
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # در غیر این صورت به صفحه اصلی اپلیکیشن هدایت شود
+    RewriteRule ^ index.html [L]
+</IfModule>

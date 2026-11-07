@@ -1,0 +1,26 @@
+# Apache Configuration for Direct Host File Storage & Streaming
+Options -Indexes +FollowSymLinks
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Range"
+    Header set Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
+    Header set Accept-Ranges bytes
+</IfModule>
+
+# MIME type definitions for media streaming and SCORM
+<IfModule mod_mime.c>
+    AddType video/mp4 .mp4
+    AddType video/webm .webm
+    AddType audio/mpeg .mp3
+    AddType audio/ogg .ogg
+    AddType audio/wav .wav
+    AddType application/pdf .pdf
+    AddType application/zip .zip
+</IfModule>
+
+# Security: prevent direct execution of PHP or script files in uploads
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|pl|py|cgi|sh|bash)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
