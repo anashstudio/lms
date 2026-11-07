@@ -13,7 +13,10 @@ import {
   Certificate,
   SystemSettings,
   AuditLog,
-  ClassSession
+  ClassSession,
+  OrgUnit,
+  JobProfile,
+  PromotionPlan
 } from '../types/models';
 
 import {
@@ -30,7 +33,10 @@ import {
   INITIAL_TNA,
   INITIAL_CERTIFICATES,
   INITIAL_AUDIT_LOGS,
-  INITIAL_SESSIONS
+  INITIAL_SESSIONS,
+  INITIAL_ORG_UNITS,
+  INITIAL_JOB_PROFILES,
+  INITIAL_PROMOTION_PLANS
 } from './seedData';
 
 const DB_STORAGE_KEY = 'enterprise_lms_sql_database_v2';
@@ -50,6 +56,9 @@ export interface DatabaseState {
   certificates: Certificate[];
   audit_logs: AuditLog[];
   sessions: ClassSession[];
+  org_units: OrgUnit[];
+  job_profiles: JobProfile[];
+  promotion_plans: PromotionPlan[];
 }
 
 export class RelationalDatabase {
@@ -66,6 +75,15 @@ export class RelationalDatabase {
         const parsed = JSON.parse(saved);
         if (!parsed.sessions) {
           parsed.sessions = [...INITIAL_SESSIONS];
+        }
+        if (!parsed.org_units || !Array.isArray(parsed.org_units) || parsed.org_units.length === 0) {
+          parsed.org_units = [...INITIAL_ORG_UNITS];
+        }
+        if (!parsed.job_profiles || !Array.isArray(parsed.job_profiles) || parsed.job_profiles.length === 0) {
+          parsed.job_profiles = [...INITIAL_JOB_PROFILES];
+        }
+        if (!parsed.promotion_plans || !Array.isArray(parsed.promotion_plans) || parsed.promotion_plans.length === 0) {
+          parsed.promotion_plans = [...INITIAL_PROMOTION_PLANS];
         }
         // اطمینان از وجود فیلدهای تفکیک‌شده نام کاربری و رمز عبور برای کاربران ذخیره شده
         if (parsed.users && Array.isArray(parsed.users)) {
@@ -112,7 +130,10 @@ export class RelationalDatabase {
       tna_records: [...INITIAL_TNA],
       certificates: [...INITIAL_CERTIFICATES],
       audit_logs: [...INITIAL_AUDIT_LOGS],
-      sessions: [...INITIAL_SESSIONS]
+      sessions: [...INITIAL_SESSIONS],
+      org_units: [...INITIAL_ORG_UNITS],
+      job_profiles: [...INITIAL_JOB_PROFILES],
+      promotion_plans: [...INITIAL_PROMOTION_PLANS]
     };
   }
 
@@ -711,6 +732,9 @@ export class RelationalDatabase {
         tna_records: [],
         certificates: [],
         sessions: [],
+        org_units: [...INITIAL_ORG_UNITS],
+        job_profiles: [...INITIAL_JOB_PROFILES],
+        promotion_plans: [],
         audit_logs: [
           {
             id: `log_init_${Date.now()}`,
@@ -826,6 +850,248 @@ export class RelationalDatabase {
       columns: ['status', 'query'],
       rows: [['EXECUTED', trimmed]],
       message: 'دستور با موفقیت تفسیر گردید.'
+    };
+  }
+
+  // --- مدیریت ساختار سازمانی (Org Units) ---
+  public getOrgUnits(): OrgUnit[] {
+    if (!this.state.org_units || this.state.org_units.length === 0) {
+      this.state.org_units = [...INITIAL_ORG_UNITS];
+      this.saveToStorage();
+    }
+    return [...this.state.org_units];
+  }
+
+  public addOrgUnit(unit: Omit<OrgUnit, 'id'> & { id?: string }): OrgUnit {
+    const newUnit: OrgUnit = {
+      ...unit,
+      id: unit.id || `unit_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+    };
+    if (!this.state.org_units) this.state.org_units = [];
+    this.state.org_units.push(newUnit);
+    this.saveToStorage();
+    this.logAudit('مدیر ارشد', 'super_admin', 'افزودن واحد سازمانی', 'org_units', `واحد جدید با عنوان ${newUnit.name} اضافه شد.`);
+    return newUnit;
+  }
+
+  public updateOrgUnit(id: string, updates: Partial<OrgUnit>): OrgUnit | null {
+    const idx = (this.state.org_units || []).findIndex(u => u.id === id);
+    if (idx === -1) return null;
+    const updated = { ...this.state.org_units[idx], ...updates };
+    this.state.org_units[idx] = updated;
+    this.saveToStorage();
+    return updated;
+  }
+
+  public deleteOrgUnit(id: string): boolean {
+    const initialLen = (this.state.org_units || []).length;
+    this.state.org_units = (this.state.org_units || []).filter(u => u.id !== id);
+    if (this.state.org_units.length !== initialLen) {
+      this.saveToStorage();
+      return true;
+    }
+    return false;
+  }
+
+  // --- مدیریت شناسنامه‌های شغلی (Job Profiles) ---
+  public getJobProfiles(): JobProfile[] {
+    if (!this.state.job_profiles || this.state.job_profiles.length === 0) {
+      this.state.job_profiles = [...INITIAL_JOB_PROFILES];
+      this.saveToStorage();
+    }
+    return [...this.state.job_profiles];
+  }
+
+  public getJobProfileById(id: string): JobProfile | undefined {
+    return this.getJobProfiles().find(j => j.id === id);
+  }
+
+  public addJobProfile(profile: Omit<JobProfile, 'id' | 'created_at'> & { id?: string; created_at?: string }): JobProfile {
+    const newProfile: JobProfile = {
+      ...profile,
+      id: profile.id || `job_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      created_at: profile.created_at || new Date().toISOString().split('T')[0]
+    };
+    if (!this.state.job_profiles) this.state.job_profiles = [];
+    this.state.job_profiles.push(newProfile);
+    this.saveToStorage();
+    this.logAudit('مدیر ارشد', 'super_admin', 'افزودن شناسنامه شغلی', 'job_profiles', `شناسنامه شغل ${newProfile.title} ثبت گردید.`);
+    return newProfile;
+  }
+
+  public updateJobProfile(id: string, updates: Partial<JobProfile>): JobProfile | null {
+    const profiles = this.getJobProfiles();
+    const idx = profiles.findIndex(j => j.id === id);
+    if (idx === -1) return null;
+    const updated = { ...profiles[idx], ...updates };
+    this.state.job_profiles[idx] = updated;
+    this.saveToStorage();
+    return updated;
+  }
+
+  public deleteJobProfile(id: string): boolean {
+    const profiles = this.getJobProfiles();
+    const filtered = profiles.filter(j => j.id !== id);
+    if (filtered.length !== profiles.length) {
+      this.state.job_profiles = filtered;
+      this.saveToStorage();
+      return true;
+    }
+    return false;
+  }
+
+  // --- مدیریت برنامه‌ریزی ترفیع و انتصابات (Promotion Plans) ---
+  public getPromotionPlans(personnelId?: string): PromotionPlan[] {
+    if (!this.state.promotion_plans || this.state.promotion_plans.length === 0) {
+      this.state.promotion_plans = [...INITIAL_PROMOTION_PLANS];
+      this.saveToStorage();
+    }
+    if (personnelId) {
+      return this.state.promotion_plans.filter(p => p.personnel_id === personnelId);
+    }
+    return [...this.state.promotion_plans];
+  }
+
+  public getPromotionPlanById(id: string): PromotionPlan | undefined {
+    return this.getPromotionPlans().find(p => p.id === id);
+  }
+
+  public addPromotionPlan(plan: Omit<PromotionPlan, 'id' | 'created_at'> & { id?: string; created_at?: string }): PromotionPlan {
+    const newPlan: PromotionPlan = {
+      ...plan,
+      id: plan.id || `prp_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      created_at: plan.created_at || new Date().toISOString().split('T')[0]
+    };
+    if (!this.state.promotion_plans) this.state.promotion_plans = [];
+    this.state.promotion_plans.unshift(newPlan);
+    this.saveToStorage();
+    this.logAudit('مدیر آموزش', 'class_manager', 'ثبت برنامه آموزشی انتصاب', 'promotion_plans', `طرح توسعه و انتصاب برای ${newPlan.personnel_name} ایجاد شد.`);
+    return newPlan;
+  }
+
+  public updatePromotionPlan(id: string, updates: Partial<PromotionPlan>): PromotionPlan | null {
+    const plans = this.getPromotionPlans();
+    const idx = plans.findIndex(p => p.id === id);
+    if (idx === -1) return null;
+    const updated = { ...plans[idx], ...updates };
+    this.state.promotion_plans[idx] = updated;
+    this.saveToStorage();
+    return updated;
+  }
+
+  public deletePromotionPlan(id: string): boolean {
+    const plans = this.getPromotionPlans();
+    const filtered = plans.filter(p => p.id !== id);
+    if (filtered.length !== plans.length) {
+      this.state.promotion_plans = filtered;
+      this.saveToStorage();
+      return true;
+    }
+    return false;
+  }
+
+  public updatePromotionCourseStatus(
+    planId: string,
+    courseScheduleId: string,
+    status: 'not_started' | 'in_progress' | 'completed',
+    passedGrade?: number
+  ): PromotionPlan | null {
+    const plan = this.getPromotionPlanById(planId);
+    if (!plan) return null;
+
+    const course = plan.courses_schedule.find(c => c.id === courseScheduleId);
+    if (!course) return null;
+
+    course.status = status;
+    if (passedGrade !== undefined) {
+      course.passed_grade = passedGrade;
+    }
+
+    const completedCourses = plan.courses_schedule.filter(c => c.status === 'completed');
+    const completedHours = completedCourses.reduce((sum, c) => sum + (c.duration_hours || 0), 0);
+    const totalHours = plan.courses_schedule.reduce((sum, c) => sum + (c.duration_hours || 0), 0) || 1;
+    const readinessScore = Math.min(100, Math.round((completedHours / totalHours) * 100));
+
+    const updatedPlan = this.updatePromotionPlan(planId, {
+      completed_hours: completedHours,
+      readiness_score: readinessScore,
+      status: readinessScore >= 100 ? 'ready_for_appointment' : 'in_progress',
+      courses_schedule: [...plan.courses_schedule]
+    });
+
+    return updatedPlan;
+  }
+
+  public analyzePromotionGap(personnelId: string, targetJobId: string): {
+    targetJob: JobProfile | undefined;
+    personnel: User | undefined;
+    currentJob: JobProfile | undefined;
+    requiredCourses: any[];
+    missingCourses: any[];
+    completedCourses: any[];
+    readinessPercent: number;
+    totalHoursNeeded: number;
+  } {
+    const targetJob = this.getJobProfileById(targetJobId);
+    const personnel = this.getUsers().find(u => u.id === personnelId);
+    const currentJob = this.getJobProfiles().find(j => j.title === personnel?.job_title || j.id === targetJob?.next_promotion_job_ids[0]);
+
+    if (!targetJob) {
+      return {
+        targetJob: undefined,
+        personnel,
+        currentJob,
+        requiredCourses: [],
+        missingCourses: [],
+        completedCourses: [],
+        readinessPercent: 0,
+        totalHoursNeeded: 0
+      };
+    }
+
+    const userEnrollments = this.getEnrollments(personnelId);
+    const userCertificates = this.getCertificates().filter(c => c.user_id === personnelId);
+    const allCourses = this.getCourses();
+
+    const passedCourseTitles = new Set<string>();
+    userEnrollments.forEach(e => {
+      if (e.status === 'completed' || e.progress_percent >= 80) {
+        const c = allCourses.find(course => course.id === e.course_id);
+        if (c) passedCourseTitles.add(c.title.trim().toLowerCase());
+      }
+    });
+    userCertificates.forEach(cert => {
+      passedCourseTitles.add(cert.course_title.trim().toLowerCase());
+    });
+
+    const completedCourses: any[] = [];
+    const missingCourses: any[] = [];
+
+    targetJob.required_courses.forEach(req => {
+      const isPassed = Array.from(passedCourseTitles).some(title => 
+        title.includes(req.course_name.toLowerCase()) || req.course_name.toLowerCase().includes(title)
+      );
+      if (isPassed) {
+        completedCourses.push(req);
+      } else {
+        missingCourses.push(req);
+      }
+    });
+
+    const totalHours = targetJob.required_courses.reduce((sum, c) => sum + c.duration_hours, 0) || 1;
+    const completedHours = completedCourses.reduce((sum, c) => sum + c.duration_hours, 0);
+    const readinessPercent = Math.min(100, Math.round((completedHours / totalHours) * 100));
+    const totalHoursNeeded = missingCourses.reduce((sum, c) => sum + c.duration_hours, 0);
+
+    return {
+      targetJob,
+      personnel,
+      currentJob,
+      requiredCourses: targetJob.required_courses,
+      missingCourses,
+      completedCourses,
+      readinessPercent,
+      totalHoursNeeded
     };
   }
 

@@ -16,7 +16,8 @@ import {
   ShieldCheck,
   Building2,
   Cpu,
-  KeyRound
+  KeyRound,
+  Award
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -78,6 +79,13 @@ export const Sidebar: React.FC = () => {
       title: 'مدیریت کاربران و پرسنل',
       icon: Users,
       module: 'users'
+    },
+    {
+      id: 'promotions',
+      title: 'ترفیع و انتصابات سازمانی',
+      icon: Award,
+      module: 'promotions',
+      badge: 'جدید'
     },
     {
       id: 'settings',

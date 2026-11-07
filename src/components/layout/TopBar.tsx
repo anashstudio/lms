@@ -21,7 +21,8 @@ import {
   CheckCircle2,
   ChevronDown,
   Calendar,
-  X
+  X,
+  Award
 } from 'lucide-react';
 import { PersianDatePicker } from '../common/PersianDatePicker';
 
@@ -128,6 +129,12 @@ export const TopBar: React.FC = () => {
       id: 'reports',
       title: 'گزارش',
       icon: FileSpreadsheet,
+      allowedRoles: ['super_admin', 'class_manager', 'instructor', 'learner']
+    },
+    {
+      id: 'promotions',
+      title: 'ترفیع و انتصاب',
+      icon: Award,
       allowedRoles: ['super_admin', 'class_manager', 'instructor', 'learner']
     },
     {

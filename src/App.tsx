@@ -19,6 +19,7 @@ import { SetupWizard } from './components/setup/SetupWizard';
 import { UserProfileModal } from './components/profile/UserProfileModal';
 import { PermissionsMatrix } from './components/permissions/PermissionsMatrix';
 import { SystemUpdaterCenter } from './components/updater/SystemUpdaterCenter';
+import { PromotionCenter } from './components/promotions/PromotionCenter';
 import { LoginView } from './components/auth/LoginView';
 
 const MainLayout: React.FC = () => {
@@ -77,6 +78,8 @@ const MainLayout: React.FC = () => {
           {activeView === 'reports' && <ReportsCenter />}
 
           {activeView === 'users' && <UserManagement />}
+          
+          {activeView === 'promotions' && <PromotionCenter />}
 
           {activeView === 'permissions' && <PermissionsMatrix />}
 

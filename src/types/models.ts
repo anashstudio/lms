@@ -7,6 +7,7 @@ export type AppModule =
   | 'sessions'
   | 'reports'
   | 'users'
+  | 'promotions'
   | 'permissions'
   | 'settings'
   | 'system_updater'
@@ -335,3 +336,81 @@ export interface SystemSnapshot {
   records_count: number;
   snapshot_hash: string;
 }
+
+// --- مدل‌های ساختار سازمانی، شناسنامه شغلی و ترفیع و انتصاب ---
+
+export interface OrgUnit {
+  id: string;
+  code: string;
+  name: string;
+  parent_id?: string;
+  manager_name?: string;
+  description?: string;
+  employee_count?: number;
+}
+
+export interface JobRequiredCourse {
+  id: string;
+  course_name: string;
+  duration_hours: number;
+  category: 'تخصصی' | 'ایمنی و HSE' | 'مدیریتی و سرپرستی' | 'عمومی و مهارتی';
+  is_mandatory: boolean;
+  min_score?: number;
+  description?: string;
+}
+
+export interface JobProfile {
+  id: string;
+  job_code: string;
+  title: string;
+  org_unit_id: string;
+  org_unit_name: string;
+  grade_level: string; // مثال: رده ۱۲ - کارشناسی، رده ۱۴ - سرپرستی
+  education_requirement: string; // حداقل مدرک و رشته
+  experience_years_required: number; // سابقه کار الزامی (سال)
+  general_competencies: string[]; // شایستگی‌های عمومی
+  technical_competencies: string[]; // شایستگی‌های تخصصی
+  next_promotion_job_ids: string[]; // پست‌های ترفیع و انتصاب بعدی
+  required_courses: JobRequiredCourse[]; // دوره‌های الزامی این شغل
+  created_at: string;
+}
+
+export interface PromotionCourseSchedule {
+  id: string;
+  course_name: string;
+  duration_hours: number;
+  category: string;
+  planned_start_date: string;
+  planned_end_date: string;
+  target_quarter: string; // مثال: سه ماهه اول، سه ماهه دوم
+  status: 'not_started' | 'in_progress' | 'completed';
+  priority: 'high' | 'medium' | 'low';
+  instructor_name?: string;
+  passed_grade?: number;
+  notes?: string;
+}
+
+export interface PromotionPlan {
+  id: string;
+  personnel_id: string;
+  personnel_name: string;
+  employee_id: string;
+  national_id?: string;
+  department: string;
+  current_job_id: string;
+  current_job_title: string;
+  target_job_id: string;
+  target_job_title: string;
+  planning_horizon: string; // مثال: ۶ ماهه، ۹ ماهه، یک ساله ۱۴۰۵
+  start_date: string;
+  end_date: string;
+  readiness_score: number; // درصد آمادگی انتصاب (۰ تا ۱۰۰)
+  total_hours_required: number;
+  completed_hours: number;
+  courses_schedule: PromotionCourseSchedule[];
+  status: 'draft' | 'approved' | 'in_progress' | 'ready_for_appointment';
+  created_at: string;
+  approved_by?: string;
+  notes?: string;
+}
+

@@ -12,7 +12,10 @@ import {
   Certificate,
   SystemSettings,
   AuditLog,
-  ClassSession
+  ClassSession,
+  OrgUnit,
+  JobProfile,
+  PromotionPlan
 } from '../types/models';
 
 export const INITIAL_SETTINGS: SystemSettings = {
@@ -877,3 +880,464 @@ export const INITIAL_SESSIONS: ClassSession[] = [
     status: 'completed'
   }
 ];
+
+export const INITIAL_ORG_UNITS: OrgUnit[] = [
+  {
+    id: 'unit_ops',
+    code: 'OPS-100',
+    name: 'مدیریت عملیات و پالایش نفت',
+    manager_name: 'مهندس محمدرضا امیریوسفی',
+    description: 'واحدهای تقطیر در اتمسفر و خلاء، هیدروکراکینگ، ایزومریزاسیون و بازیابی گوگرد',
+    employee_count: 145
+  },
+  {
+    id: 'unit_hse',
+    code: 'HSE-200',
+    name: 'اداره سلامت، ایمنی و محیط‌زیست (HSE)',
+    manager_name: 'دکتر علیرضا کاویانی',
+    description: 'مدیریت ایمنی فرآیند (PSM)، آتش‌نشانی، پدافند غیرعامل و کنترل آلاینده‌های زیست‌محیطی',
+    employee_count: 52
+  },
+  {
+    id: 'unit_maint',
+    code: 'MNT-300',
+    name: 'مدیریت نگهداری و تعمیرات فنی (نت)',
+    manager_name: 'مهندس حسام داوودی',
+    description: 'تعمیرات اساسی، ماشین‌آلات دوار، برق و ابزاردقیق، بازرسی فنی و پایش وضعیت CBM',
+    employee_count: 110
+  },
+  {
+    id: 'unit_process',
+    code: 'ENG-400',
+    name: 'مهندسی فرآیند و کنترل کیفیت',
+    manager_name: 'مهندس فرناز سپهری',
+    description: 'شبیه‌سازی فرآیندی، بهینه‌سازی کاتالیست‌ها، موازنه انرژی و کنترل کیفیت فرآورده‌ها',
+    employee_count: 38
+  },
+  {
+    id: 'unit_hrd',
+    code: 'HRD-500',
+    name: 'توسعه منابع انسانی و آموزش',
+    manager_name: 'دکتر بهرام سرمد',
+    description: 'برنامه‌ریزی شایستگی‌های شغلی، جانشین‌پروری، سنجش اثربخشی و ارتقای شایستگی پرسنل',
+    employee_count: 24
+  }
+];
+
+export const INITIAL_JOB_PROFILES: JobProfile[] = [
+  {
+    id: 'job_ops_01',
+    job_code: 'JOB-OPS-01',
+    title: 'کارشناس فرآیند تقطیر و تفکیک نفت خام',
+    org_unit_id: 'unit_ops',
+    org_unit_name: 'مدیریت عملیات و پالایش نفت',
+    grade_level: 'رده ۱۱ - کارشناسی',
+    education_requirement: 'کارشناسی مهندسی شیمی / نفت / صنایع پتروشیمی',
+    experience_years_required: 2,
+    general_competencies: ['کار تیمی در محیط‌های صنعتی', 'ارتباطات اثربخش شیفت', 'گزارش‌نویسی فنی'],
+    technical_competencies: ['موازنه‌های جرمی و حرارتی برج تقطیر', 'نقشه‌خوانی استانداردهای P&ID', 'عملکرد پمپ‌ها و تجهیزات تبادل حرارت'],
+    next_promotion_job_ids: ['job_ops_02'],
+    created_at: '۱۴۰۴/۱۰/۰۱',
+    required_courses: [
+      {
+        id: 'req_c1',
+        course_name: 'اصول بهره‌برداری برج‌های تقطیر اتمسفری و خلاء',
+        duration_hours: 24,
+        category: 'تخصصی',
+        is_mandatory: true,
+        min_score: 75,
+        description: 'آشنایی با متغیرهای عملیاتی رفلاکس، فشار، پروفایل دمایی سینی‌ها و تفکیک برش‌ها'
+      },
+      {
+        id: 'req_c2',
+        course_name: 'مبانی ایمنی فرآیند و دستورالعمل پروانه‌های کار (PTW)',
+        duration_hours: 16,
+        category: 'ایمنی و HSE',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'قوانین ورود به فضاهای بسته، ایزولاسیون مکانیکی و گازسنجی مخازن هیدروکربوری'
+      },
+      {
+        id: 'req_c3',
+        course_name: 'کنترل عملیاتی پمپ‌ها، توربین‌ها و کمپرسورهای فرآیندی',
+        duration_hours: 20,
+        category: 'تخصصی',
+        is_mandatory: true,
+        min_score: 70,
+        description: 'عیب‌یابی کاویتاسیون، سرج کمپرسور و پایش متغیرهای ارتعاشی در سایت عملیات'
+      }
+    ]
+  },
+  {
+    id: 'job_ops_02',
+    job_code: 'JOB-OPS-02',
+    title: 'کارشناس ارشد اتاق کنترل عملیات (DCS)',
+    org_unit_id: 'unit_ops',
+    org_unit_name: 'مدیریت عملیات و پالایش نفت',
+    grade_level: 'رده ۱۳ - کارشناسی ارشد',
+    education_requirement: 'کارشناسی یا کارشناسی ارشد مهندسی شیمی / نفت',
+    experience_years_required: 5,
+    general_competencies: ['مدیریت استرس در شرایط اضطراری', 'حل مسئله و تصمیم‌گیری سریع', 'هماهنگی تیم‌های سایت'],
+    technical_competencies: ['سیستم‌های کنترل توزیع‌شده DCS یوکوگاوا و هانیول', 'منطق‌های اینترلاک و ESD', 'کنترل پیشرفته فرآیند APC'],
+    next_promotion_job_ids: ['job_ops_03'],
+    created_at: '۱۴۰۴/۱۰/۰۱',
+    required_courses: [
+      {
+        id: 'req_c4',
+        course_name: 'مدیریت آلارم‌ها و سناریوهای اضطراری در سیستم DCS',
+        duration_hours: 32,
+        category: 'تخصصی',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'بررسی ریشه‌ای حوادث، پایش سیل آلارم‌ها و اقدامات فوری پایدارسازی فرآیند'
+      },
+      {
+        id: 'req_c5',
+        course_name: 'تحلیل مخاطرات فرآیندی و ممیزی ایمنی به روش HAZOP & LOPA',
+        duration_hours: 24,
+        category: 'ایمنی و HSE',
+        is_mandatory: true,
+        min_score: 75,
+        description: 'شناسایی انحرافات عملیاتی، عوامل ایجاد خطر و ارزیابی لایه‌های حفاظتی مستقل'
+      },
+      {
+        id: 'req_c6',
+        course_name: 'بهینه‌سازی راکتورهای هیدروکراکینگ و واکنش‌های کاتالیستی',
+        duration_hours: 28,
+        category: 'تخصصی',
+        is_mandatory: true,
+        min_score: 75,
+        description: 'کنترل دمای راکتورهای تحت فشار هیدروژن، مهار واکنش‌های گرمازای شدید و افزایش طول عمر کاتالیست'
+      },
+      {
+        id: 'req_c7',
+        course_name: 'سیستم‌های توقف اضطراری ESD و استانداردهای IEC 61511',
+        duration_hours: 20,
+        category: 'تخصصی',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'طراحی سطوح یکپارچگی ایمنی SIL و مکانیزم‌های قطع سریع جریان خوراک'
+      }
+    ]
+  },
+  {
+    id: 'job_ops_03',
+    job_code: 'JOB-OPS-03',
+    title: 'سرپرست شیفت عملیات و بهره‌برداری پالایشگاه',
+    org_unit_id: 'unit_ops',
+    org_unit_name: 'مدیریت عملیات و پالایش نفت',
+    grade_level: 'رده ۱۵ - سرپرستی ارشد',
+    education_requirement: 'کارشناسی یا بالاتر مهندسی با حداقل ۸ سال سابقه عملیاتی',
+    experience_years_required: 8,
+    general_competencies: ['رهبری تیم‌های نوبت‌کاری', 'مدیریت منابع در شیفت‌های شب', 'مذاکره و حل تعارض سازمانی'],
+    technical_competencies: ['فرماندهی حوادث صنعتی پالایشگاهی', 'ممیزی جامع ایمنی شیفت', 'پایش شاخص‌های عملکرد روزانه کل واحدها'],
+    next_promotion_job_ids: ['job_ops_04'],
+    created_at: '۱۴۰۴/۱۰/۰۱',
+    required_courses: [
+      {
+        id: 'req_c8',
+        course_name: 'مهارت‌های نوین سرپرستی و رهبری تیم‌های عملیاتی شیفت',
+        duration_hours: 36,
+        category: 'مدیریتی و سرپرستی',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'روانشناسی محیط کار نوبت‌کاری، انگیزش پرسنل و انتقال شفاف اطلاعات در تعویض شیفت'
+      },
+      {
+        id: 'req_c9',
+        course_name: 'فرماندهی صحنه حادثه و مدیریت بحران‌های صنعتی (ICS 300)',
+        duration_hours: 30,
+        category: 'ایمنی و HSE',
+        is_mandatory: true,
+        min_score: 85,
+        description: 'طرح واکنش در شرایط اضطراری ERP، تخلیه اضطراری، کنترل نشت گاز سمی H2S و هماهنگی آتش‌نشانی'
+      },
+      {
+        id: 'req_c10',
+        course_name: 'قوانین کار، ایمنی کارگاهی و ارزیابی شایستگی‌های عملکرد پرسنل',
+        duration_hours: 20,
+        category: 'مدیریتی و سرپرستی',
+        is_mandatory: true,
+        min_score: 75,
+        description: 'آیین‌نامه‌های انضباطی، بازخورددهی سازنده و مستندسازی تخلفات و تشویق‌های کارکنان'
+      },
+      {
+        id: 'req_c11',
+        course_name: 'مدیریت ریسک دارایی‌های فیزیکی و پایش توقفات ناخواسته (RCFA)',
+        duration_hours: 24,
+        category: 'تخصصی',
+        is_mandatory: true,
+        min_score: 75,
+        description: 'تحلیل علل ریشه‌ای از کار افتادگی تجهیزات، کاهش ضایعات فلرینگ و ارتقای ضریب در دسترس بودن'
+      }
+    ]
+  },
+  {
+    id: 'job_ops_04',
+    job_code: 'JOB-OPS-04',
+    title: 'رئیس واحد پالایش و تقطیر نفت خام',
+    org_unit_id: 'unit_ops',
+    org_unit_name: 'مدیریت عملیات و پالایش نفت',
+    grade_level: 'رده ۱۷ - مدیریت پایه',
+    education_requirement: 'کارشناسی ارشد مهندسی شیمی / نفت / MBA مدیریت اجرایی با ۱۲ سال سابقه',
+    experience_years_required: 12,
+    general_competencies: ['برنامه‌ریزی استراتژیک تولید', 'تفکر سیستمی و بهبود بهره‌وری', 'رهبری تحول سازمانی'],
+    technical_competencies: ['مدیریت زنجیره ارزش پالایشگاه', 'استاندارد مدیریت دارایی‌های فیزیکی ISO 55001', 'مدیریت بودجه عملیاتی OPEX'],
+    next_promotion_job_ids: [],
+    created_at: '۱۴۰۴/۱۰/۰۱',
+    required_courses: [
+      {
+        id: 'req_c12',
+        course_name: 'بودجه‌ریزی بر مبنای عملکرد و مدیریت هزینه‌های عملیاتی در صنعت نفت',
+        duration_hours: 32,
+        category: 'مدیریتی و سرپرستی',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'کنترل هزینه‌های تعمیراتی، مدیریت مصرف انرژی و تحلیل سودآوری پالایشگاه'
+      },
+      {
+        id: 'req_c13',
+        course_name: 'مدیریت استراتژیک عملیات و شاخص‌های کلیدی بهره‌وری (KPIs)',
+        duration_hours: 30,
+        category: 'مدیریتی و سرپرستی',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'طراحی داشبوردهای مدیریتی، پایش راندمان حرارتی و سنجش عملکرد واحدهای تقطیر'
+      },
+      {
+        id: 'req_c14',
+        course_name: 'پیاده‌سازی استاندارد بین‌المللی مدیریت دارایی‌های فیزیکی ISO 55000',
+        duration_hours: 24,
+        category: 'مدیریتی و سرپرستی',
+        is_mandatory: true,
+        min_score: 75,
+        description: 'چرخه عمر تجهیزات، استراتژی‌های تعویض و بازسازی تاسیسات فرآیندی'
+      }
+    ]
+  },
+  {
+    id: 'job_hse_01',
+    job_code: 'JOB-HSE-01',
+    title: 'کارشناس ایمنی، بهداشت و حفاظت فنی',
+    org_unit_id: 'unit_hse',
+    org_unit_name: 'اداره سلامت، ایمنی و محیط‌زیست (HSE)',
+    grade_level: 'رده ۱۱ - کارشناسی',
+    education_requirement: 'کارشناسی مهندسی بهداشت حرفه‌ای / مهندسی ایمنی صنعتی / محیط زیست',
+    experience_years_required: 2,
+    general_competencies: ['دقت بالا در ممیزی میدانی', 'قاطعیت در اجرای استانداردهای ایمنی', 'آموزش پرسنل کارگاهی'],
+    technical_competencies: ['بازرسی فنی سیستم‌های اطفای حریق', 'گازسنجی پرتابل و آنلاین', 'ممیزی کار در ارتفاع و فضاهای محصور'],
+    next_promotion_job_ids: ['job_hse_02'],
+    created_at: '۱۴۰۴/۱۰/۰۱',
+    required_courses: [
+      {
+        id: 'req_h1',
+        course_name: 'الزامات جامع پروانه‌های کار گرم، سرد و تشعشع (PTW)',
+        duration_hours: 20,
+        category: 'ایمنی و HSE',
+        is_mandatory: true,
+        min_score: 85,
+        description: 'صدور، تمدید و ابطال انواع مجوزهای کاری پالایشگاهی و کنترل ریسک‌های همزمان'
+      },
+      {
+        id: 'req_h2',
+        course_name: 'سیستم‌های گازسنجی و پایش اتمسفرهای خطرناک هیدروکربوری و H2S',
+        duration_hours: 18,
+        category: 'ایمنی و HSE',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'کالیبراسیون دتکتورها، حد مجاز LEL و اقدامات حفاظتی هنگام مواجهه با گازهای کشنده'
+      },
+      {
+        id: 'req_h3',
+        course_name: 'روش‌های اطفا حریق مخازن ذخیره نفت خام و تاسیسات فرآیندی',
+        duration_hours: 24,
+        category: 'ایمنی و HSE',
+        is_mandatory: true,
+        min_score: 75,
+        description: 'کار با سیستم‌های فوم دلکتور، کولینگ بدنه مخازن و پمپ‌های آتش‌نشانی پرفشار'
+      }
+    ]
+  },
+  {
+    id: 'job_hse_02',
+    job_code: 'JOB-HSE-02',
+    title: 'کارشناس ارشد ایمنی فرآیند (PSM) و ارزیابی ریسک',
+    org_unit_id: 'unit_hse',
+    org_unit_name: 'اداره سلامت، ایمنی و محیط‌زیست (HSE)',
+    grade_level: 'رده ۱۴ - کارشناسی ارشد',
+    education_requirement: 'کارشناسی ارشد ایمنی صنعتی / مهندسی شیمی با ۵ سال سابقه',
+    experience_years_required: 5,
+    general_competencies: ['تحلیل داده‌های آماری حوادث', 'مستندسازی گزارشات رسمی ممیزی', 'مذاکره فنی با مدیران تولید'],
+    technical_competencies: ['پیاده‌سازی ۱۴ عنصر OSHA PSM', 'نرم‌افزارهای شبیه‌سازی انتشار گاز و انفجار Phast', 'ارزیابی ریسک به روش Bow-Tie'],
+    next_promotion_job_ids: [],
+    created_at: '۱۴۰۴/۱۰/۰۱',
+    required_courses: [
+      {
+        id: 'req_h4',
+        course_name: 'استقرار جامع مدیریت ایمنی فرآیند (OSHA 1910.119 PSM)',
+        duration_hours: 40,
+        category: 'ایمنی و HSE',
+        is_mandatory: true,
+        min_score: 85,
+        description: 'مدیریت تغییر (MOC)، یکپارچگی مکانیکی، مشارکت کارکنان و پیشگیری از حوادث فرآیندی'
+      },
+      {
+        id: 'req_h5',
+        course_name: 'مدل‌سازی و تحلیل پیامد حوادث انفجار و نشت با نرم‌افزار Phast',
+        duration_hours: 32,
+        category: 'تخصصی',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'شبیه‌سازی حریق استخری، BLEVE و ابر بخار آتش‌گیر VCE در مجاورت شهرک‌های مسکونی'
+      },
+      {
+        id: 'req_h6',
+        course_name: 'تکنیک‌های پیشرفته ارزیابی ریسک به روش Bow-Tie و تحلیل مانع',
+        duration_hours: 24,
+        category: 'تخصصی',
+        is_mandatory: true,
+        min_score: 80,
+        description: 'ترسیم دیاگرام‌های پاپیونی، موانع پیشگیرانه و موانع کاهش اثرات پیامدهای وخیم'
+      }
+    ]
+  }
+];
+
+export const INITIAL_PROMOTION_PLANS: PromotionPlan[] = [
+  {
+    id: 'prp_001',
+    personnel_id: 'usr_learner_1',
+    personnel_name: 'احمد مرادی',
+    employee_id: 'EMP-4482',
+    national_id: '1289945120',
+    department: 'مدیریت عملیات و پالایش نفت',
+    current_job_id: 'job_ops_01',
+    current_job_title: 'کارشناس فرآیند تقطیر و تفکیک نفت خام',
+    target_job_id: 'job_ops_02',
+    target_job_title: 'کارشناس ارشد اتاق کنترل عملیات (DCS)',
+    planning_horizon: 'بازه ۶ ماهه (۱۴۰۵/۰۹/۰۱ لغایت ۱۴۰۶/۰۲/۳۰)',
+    start_date: '۱۴۰۵/۰۹/۰۱',
+    end_date: '۱۴۰۶/۰۲/۳۰',
+    readiness_score: 45,
+    total_hours_required: 104,
+    completed_hours: 48,
+    status: 'in_progress',
+    created_at: '۱۴۰۵/۰۸/۱۵',
+    approved_by: 'مهندس محمدرضا امیریوسفی',
+    notes: 'نامبرده در کانون ارزیابی شایستگی‌های اتاق کنترل نمره بالایی اخذ نموده و جهت احراز پست DCS دوره‌های مربوطه برنامه‌ریزی شد.',
+    courses_schedule: [
+      {
+        id: 'psch_1',
+        course_name: 'مدیریت آلارم‌ها و سناریوهای اضطراری در سیستم DCS',
+        duration_hours: 32,
+        category: 'تخصصی',
+        planned_start_date: '۱۴۰۵/۰۹/۰۵',
+        planned_end_date: '۱۴۰۵/۱۰/۱۰',
+        target_quarter: 'ماه اول و دوم',
+        status: 'completed',
+        priority: 'high',
+        instructor_name: 'مهندس حسام داوودی',
+        passed_grade: 88,
+        notes: 'دوره با موفقیت گذرانده شد.'
+      },
+      {
+        id: 'psch_2',
+        course_name: 'تحلیل مخاطرات فرآیندی و ممیزی ایمنی به روش HAZOP & LOPA',
+        duration_hours: 24,
+        category: 'ایمنی و HSE',
+        planned_start_date: '۱۴۰۵/۱۰/۱۵',
+        planned_end_date: '۱۴۰۵/۱۱/۲۰',
+        target_quarter: 'ماه دوم و سوم',
+        status: 'in_progress',
+        priority: 'high',
+        instructor_name: 'دکتر علیرضا کاویانی',
+        notes: 'جلسات کارگاهی در حال برگزاری است.'
+      },
+      {
+        id: 'psch_3',
+        course_name: 'بهینه‌سازی راکتورهای هیدروکراکینگ و واکنش‌های کاتالیستی',
+        duration_hours: 28,
+        category: 'تخصصی',
+        planned_start_date: '۱۴۰۵/۱۱/۲۵',
+        planned_end_date: '۱۴۰۵/۱۲/۲۸',
+        target_quarter: 'ماه سوم و چهارم',
+        status: 'not_started',
+        priority: 'medium',
+        instructor_name: 'مهندس فرناز سپهری'
+      },
+      {
+        id: 'psch_4',
+        course_name: 'سیستم‌های توقف اضطراری ESD و استانداردهای IEC 61511',
+        duration_hours: 20,
+        category: 'تخصصی',
+        planned_start_date: '۱۴۰۶/۰۱/۱۵',
+        planned_end_date: '۱۴۰۶/۰۲/۲۰',
+        target_quarter: 'ماه پنجم و ششم',
+        status: 'not_started',
+        priority: 'high',
+        instructor_name: 'مهندس محمدرضا امیریوسفی'
+      }
+    ]
+  },
+  {
+    id: 'prp_002',
+    personnel_id: 'usr_learner_2',
+    personnel_name: 'سارا کاظمی',
+    employee_id: 'EMP-5921',
+    national_id: '1270034891',
+    department: 'اداره سلامت، ایمنی و محیط‌زیست (HSE)',
+    current_job_id: 'job_hse_01',
+    current_job_title: 'کارشناس ایمنی، بهداشت و حفاظت فنی',
+    target_job_id: 'job_hse_02',
+    target_job_title: 'کارشناس ارشد ایمنی فرآیند (PSM) و ارزیابی ریسک',
+    planning_horizon: 'بازه ۹ ماهه (۱۴۰۵/۰۹/۰۱ لغایت ۱۴۰۶/۰۵/۳۰)',
+    start_date: '۱۴۰۵/۰۹/۰۱',
+    end_date: '۱۴۰۶/۰۵/۳۰',
+    readiness_score: 25,
+    total_hours_required: 96,
+    completed_hours: 24,
+    status: 'in_progress',
+    created_at: '۱۴۰۵/۰۸/۲۰',
+    approved_by: 'دکتر بهرام سرمد',
+    notes: 'طرح توسعه شایستگی تخصصی ایمنی فرآیند جهت ارتقا به رتبه ۱۴ سازمانی.',
+    courses_schedule: [
+      {
+        id: 'psch_5',
+        course_name: 'استقرار جامع مدیریت ایمنی فرآیند (OSHA 1910.119 PSM)',
+        duration_hours: 40,
+        category: 'ایمنی و HSE',
+        planned_start_date: '۱۴۰۵/۰۹/۱۰',
+        planned_end_date: '۱۴۰۵/۱۱/۱۰',
+        target_quarter: 'سه ماهه اول',
+        status: 'in_progress',
+        priority: 'high',
+        instructor_name: 'دکتر علیرضا کاویانی'
+      },
+      {
+        id: 'psch_6',
+        course_name: 'مدل‌سازی و تحلیل پیامد حوادث انفجار و نشت با نرم‌افزار Phast',
+        duration_hours: 32,
+        category: 'تخصصی',
+        planned_start_date: '۱۴۰۵/۱۱/۱۵',
+        planned_end_date: '۱۴۰۶/۰۲/۱۵',
+        target_quarter: 'سه ماهه دوم',
+        status: 'not_started',
+        priority: 'high',
+        instructor_name: 'مهندس فرناز سپهری'
+      },
+      {
+        id: 'psch_7',
+        course_name: 'تکنیک‌های پیشرفته ارزیابی ریسک به روش Bow-Tie و تحلیل مانع',
+        duration_hours: 24,
+        category: 'تخصصی',
+        planned_start_date: '۱۴۰۶/۰۲/۲۰',
+        planned_end_date: '۱۴۰۶/۰۵/۲۰',
+        target_quarter: 'سه ماهه سوم',
+        status: 'not_started',
+        priority: 'medium',
+        instructor_name: 'دکتر علیرضا کاویانی'
+      }
+    ]
+  }
+];
+

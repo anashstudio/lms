@@ -6,7 +6,9 @@ import {
   ExamAttempt,
   KirkpatrickEvaluation,
   TNARecord,
-  Certificate
+  Certificate,
+  JobProfile,
+  PromotionPlan
 } from '../types/models';
 
 function downloadWorkbook(workbook: XLSX.WorkBook, fileName: string) {
@@ -313,5 +315,202 @@ export const ExcelService = {
     if (!table) return;
     const workbook = XLSX.utils.table_to_book(table);
     downloadWorkbook(workbook, `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+  },
+
+  downloadJobProfileTemplate(): void {
+    const templateData = [
+      {
+        'کد شغل': 'JOB-OPS-05',
+        'عنوان شغل': 'مهندس ارشد بهره‌برداری واحد گاز مایع (LPG)',
+        'واحد سازمانی': 'مدیریت عملیات و پالایش نفت',
+        'رده سازمانی': 'رده ۱۴ - کارشناسی ارشد',
+        'حداقل مدرک تحصیلی': 'کارشناسی ارشد مهندسی شیمی / نفت',
+        'سابقه کار الزامی (سال)': 6,
+        'شایستگی‌های عمومی (با کاما)': 'کار تیمی, مدیریت بحران, حل مسئله عملیاتی',
+        'شایستگی‌های تخصصی (با کاما)': 'شبیه‌سازی HYSYS, فرآیند تفکیک هیدروکربورها, کنترل آلارم DCS',
+        'نام دوره‌های الزامی (با سمی‌کالن ;)': 'اصول تفکیک و شیرین‌سازی گاز مایع; مدیریت آلارم‌ها و سناریوهای اضطراری DCS; تحلیل خطرات فرآیندی HAZOP',
+        'ساعات دوره‌ها به ترتیب (با سمی‌کالن ;)': '24; 32; 20',
+        'دسته‌بندی دوره‌ها (با سمی‌کالن ;)': 'تخصصی; تخصصی; ایمنی و HSE'
+      },
+      {
+        'کد شغل': 'JOB-MNT-03',
+        'عنوان شغل': 'سرپرست تعمیرات تجهیزات دوار و توربین‌های گازی',
+        'واحد سازمانی': 'مدیریت نگهداری و تعمیرات فنی (نت)',
+        'رده سازمانی': 'رده ۱۵ - سرپرستی',
+        'حداقل مدرک تحصیلی': 'کارشناسی مهندسی مکانیک',
+        'سابقه کار الزامی (سال)': 8,
+        'شایستگی‌های عمومی (با کاما)': 'رهبری تیم‌های فنی, تصمیم‌گیری در توقفات اضطراری, نظارت ایمن',
+        'شایستگی‌های تخصصی (با کاما)': 'آنالیز ارتعاشات پیشرفته ISO 10816, تراز لیزری شفت, عیب‌یابی توربین سولار',
+        'نام دوره‌های الزامی (با سمی‌کالن ;)': 'تحلیل ارتعاشات ماشین‌آلات دوار سطح ۲; بازرسی و عیب‌یابی توربین‌های گازی; استراتژی‌های نگهداری RCM',
+        'ساعات دوره‌ها به ترتیب (با سمی‌کالن ;)': '30; 36; 24',
+        'دسته‌بندی دوره‌ها (با سمی‌کالن ;)': 'تخصصی; تخصصی; مدیریتی و سرپرستی'
+      }
+    ];
+
+    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'الگوی_شناسنامه_شغلی');
+    downloadWorkbook(workbook, `قالب_استاندارد_اکسل_شناسنامه_شغلی_LMS.xlsx`);
+  },
+
+  async parseJobProfilesFile(file: File): Promise<JobProfile[]> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const rawRows: any[] = XLSX.utils.sheet_to_json(worksheet);
+
+          const parsedProfiles: JobProfile[] = rawRows.map((row, index) => {
+            const jobCode = String(row['کد شغل'] || row['job_code'] || `JOB-IMP-${index + 1}`).trim();
+            const title = String(row['عنوان شغل'] || row['title'] || `شغل ثبت‌شده ${index + 1}`).trim();
+            const orgUnitName = String(row['واحد سازمانی'] || row['org_unit'] || 'مدیریت عملیات').trim();
+            const gradeLevel = String(row['رده سازمانی'] || row['grade'] || 'رده ۱۱ - کارشناسی').trim();
+            const education = String(row['حداقل مدرک تحصیلی'] || row['education'] || 'کارشناسی فنی').trim();
+            const expYears = Number(row['سابقه کار الزامی (سال)'] || row['experience_years'] || 3);
+
+            const genCompStr = String(row['شایستگی‌های عمومی (با کاما)'] || row['general_competencies'] || '');
+            const generalCompetencies = genCompStr
+              ? genCompStr.split(/[,،]/).map((s: string) => s.trim()).filter(Boolean)
+              : ['کار تیمی', 'ارتباطات سازمانی'];
+
+            const techCompStr = String(row['شایستگی‌های تخصصی (با کاما)'] || row['technical_competencies'] || '');
+            const technicalCompetencies = techCompStr
+              ? techCompStr.split(/[,،]/).map((s: string) => s.trim()).filter(Boolean)
+              : ['دانش تخصصی فرآیند'];
+
+            // دوره‌ها و ساعات
+            const courseNamesStr = String(row['نام دوره‌های الزامی (با سمی‌کالن ;)'] || row['courses'] || '');
+            const courseHoursStr = String(row['ساعات دوره‌ها به ترتیب (با سمی‌کالن ;)'] || row['hours'] || '');
+            const courseCatsStr = String(row['دسته‌بندی دوره‌ها (با سمی‌کالن ;)'] || row['categories'] || '');
+
+            const courseNames = courseNamesStr
+              ? courseNamesStr.split(/[;؛]/).map((s: string) => s.trim()).filter(Boolean)
+              : [];
+            const courseHours = courseHoursStr
+              ? courseHoursStr.split(/[;؛]/).map((s: string) => Number(s.trim()) || 24).filter(Boolean)
+              : [];
+            const courseCats = courseCatsStr
+              ? courseCatsStr.split(/[;؛]/).map((s: string) => s.trim()).filter(Boolean)
+              : [];
+
+            const requiredCourses = courseNames.map((cName: string, cIdx: number) => ({
+              id: `req_imp_${Date.now()}_${index}_${cIdx}`,
+              course_name: cName,
+              duration_hours: courseHours[cIdx] || 24,
+              category: (courseCats[cIdx] as any) || 'تخصصی',
+              is_mandatory: true,
+              min_score: 75
+            }));
+
+            return {
+              id: `job_imp_${Date.now()}_${index}`,
+              job_code: jobCode,
+              title,
+              org_unit_id: 'unit_custom',
+              org_unit_name: orgUnitName,
+              grade_level: gradeLevel,
+              education_requirement: education,
+              experience_years_required: expYears,
+              general_competencies: generalCompetencies,
+              technical_competencies: technicalCompetencies,
+              next_promotion_job_ids: [],
+              required_courses: requiredCourses,
+              created_at: new Date().toISOString().split('T')[0]
+            };
+          });
+
+          resolve(parsedProfiles);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  },
+
+  exportJobProfiles(jobProfiles: JobProfile[]): void {
+    const summaryData = jobProfiles.map((j) => ({
+      'کد شغل': j.job_code,
+      'عنوان شغل': j.title,
+      'واحد سازمانی': j.org_unit_name,
+      'رده شغلی': j.grade_level,
+      'شرایط تحصیلی': j.education_requirement,
+      'حداقل سابقه (سال)': j.experience_years_required,
+      'تعداد دوره‌های الزامی': j.required_courses.length,
+      'مجموع ساعات آموزش': j.required_courses.reduce((sum, c) => sum + c.duration_hours, 0),
+      'شایستگی‌های عمومی': j.general_competencies.join(' - '),
+      'شایستگی‌های تخصصی': j.technical_competencies.join(' - ')
+    }));
+
+    const coursesData: any[] = [];
+    jobProfiles.forEach((j) => {
+      j.required_courses.forEach((c, idx) => {
+        coursesData.push({
+          'کد شغل': j.job_code,
+          'عنوان شغل': j.title,
+          'ردیف دوره': idx + 1,
+          'نام دوره آموزشی': c.course_name,
+          'ساعت دوره': c.duration_hours,
+          'دسته‌بندی شایستگی': c.category,
+          'الزامی / اختیاری': c.is_mandatory ? 'الزامی جهت ترفیع' : 'اختیاری',
+          'حداقل نمره قبولی': c.min_score || 70,
+          'شرح سرفصل': c.description || ''
+        });
+      });
+    });
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(summaryData), 'شناسنامه_شغل‌ها');
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(coursesData), 'دوره‌های_شایستگی_شغل');
+    downloadWorkbook(workbook, `شناسنامه‌های_شغلی_و_شایستگی‌ها_${new Date().toISOString().split('T')[0]}.xlsx`);
+  },
+
+  exportPromotionPlans(plans: PromotionPlan[]): void {
+    const plansSummary = plans.map((p) => ({
+      'کد پرسنلی': p.employee_id,
+      'نام و نام خانوادگی': p.personnel_name,
+      'واحد سازمانی': p.department,
+      'شغل فعلی': p.current_job_title,
+      'انتصاب بعدی مورد هدف': p.target_job_title,
+      'بازه زمانی برنامه': p.planning_horizon,
+      'تاریخ شروع': p.start_date,
+      'تاریخ پایان': p.end_date,
+      'درصد آمادگی انتصاب': `${p.readiness_score}٪`,
+      'ساعت گذرانده شده': p.completed_hours,
+      'کل ساعت مورد نیاز': p.total_hours_required,
+      'وضعیت طرح': p.status === 'ready_for_appointment' ? 'آماده انتصاب' : p.status === 'in_progress' ? 'در حال اجرا' : 'پیش‌نویس'
+    }));
+
+    const scheduleData: any[] = [];
+    plans.forEach((p) => {
+      p.courses_schedule.forEach((cs, idx) => {
+        scheduleData.push({
+          'کد پرسنلی': p.employee_id,
+          'نام پرسنل': p.personnel_name,
+          'انتصاب هدف': p.target_job_title,
+          'ردیف': idx + 1,
+          'نام دوره آموزشی': cs.course_name,
+          'ساعت دوره': cs.duration_hours,
+          'گروه': cs.category,
+          'بازه هدف': cs.target_quarter,
+          'تاریخ شروع': cs.planned_start_date,
+          'تاریخ پایان': cs.planned_end_date,
+          'اولویت': cs.priority === 'high' ? 'ضروری' : cs.priority === 'medium' ? 'متوسط' : 'عادی',
+          'مدرس': cs.instructor_name || 'مرکز آموزش پالایشگاه',
+          'وضعیت': cs.status === 'completed' ? 'تکمیل شده' : cs.status === 'in_progress' ? 'درحال گذراندن' : 'شروع‌نشده',
+          'نمره اخذ شده': cs.passed_grade || '-'
+        });
+      });
+    });
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(plansSummary), 'خلاصه_طرح‌های_انتصاب');
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(scheduleData), 'جدول_زمان‌بندی_دوره‌ها');
+    downloadWorkbook(workbook, `برنامه_جامع_ترفیع_و_انتصابات_${new Date().toISOString().split('T')[0]}.xlsx`);
   }
 };

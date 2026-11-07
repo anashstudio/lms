@@ -13,6 +13,7 @@ export type ActiveNavView =
   | 'sessions' 
   | 'reports' 
   | 'users' 
+  | 'promotions'
   | 'permissions'
   | 'system_updater'
   | 'settings' 

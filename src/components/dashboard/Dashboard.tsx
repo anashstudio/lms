@@ -113,6 +113,13 @@ export const Dashboard: React.FC = () => {
               <HelpCircle className="w-4 h-4 text-amber-600" />
               <span>آزمون‌های من</span>
             </button>
+            <button
+              onClick={() => setActiveView('promotions')}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+            >
+              <Award className="w-4 h-4 text-emerald-600" />
+              <span>مسیر ارتقا و انتصاب من</span>
+            </button>
           </div>
         </div>
 
@@ -645,6 +652,13 @@ export const Dashboard: React.FC = () => {
           >
             <Users className="w-4 h-4 text-indigo-600" />
             <span>مدیریت پرسنل</span>
+          </button>
+          <button
+            onClick={() => setActiveView('promotions')}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+          >
+            <Award className="w-4 h-4 text-emerald-600" />
+            <span>ترفیع و انتصابات</span>
           </button>
           <button
             onClick={() => setActiveView('settings')}

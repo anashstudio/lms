@@ -25,6 +25,10 @@ export const MODULE_LABELS: Record<AppModule, { title: string; description: stri
     title: 'کاربران و پرسنل',
     description: 'مدیریت حساب‌های کاربری فراگیران، اساتید و مدیران'
   },
+  promotions: {
+    title: 'ترفیع و انتصابات سازمانی',
+    description: 'شناسنامه شغلی، شایستگی‌ها، تحلیل گپ و برنامه‌ریزی دوره‌های ارتقای شغلی پرسنل'
+  },
   permissions: {
     title: 'سطوح دسترسی و مجوزها',
     description: 'تنظیم ماتریس مجوزهای نقش‌ها و تفویض اختیارات ویژه'
@@ -59,6 +63,7 @@ export const DEFAULT_ROLE_PERMISSIONS: RolePermissionsMap = {
     sessions: { view: true, create: true, edit: true, delete: true, export: true },
     reports: { view: true, create: true, edit: true, delete: true, export: true },
     users: { view: true, create: true, edit: true, delete: true, export: true },
+    promotions: { view: true, create: true, edit: true, delete: true, export: true },
     permissions: { view: true, create: true, edit: true, delete: true, export: true },
     settings: { view: true, create: true, edit: true, delete: true, export: true },
     system_updater: { view: true, create: true, edit: true, delete: true, export: true },
@@ -71,6 +76,7 @@ export const DEFAULT_ROLE_PERMISSIONS: RolePermissionsMap = {
     sessions: { view: true, create: true, edit: true, delete: true, export: true },
     reports: { view: true, create: false, edit: false, delete: false, export: true },
     users: { view: true, create: true, edit: true, delete: false, export: true },
+    promotions: { view: true, create: true, edit: true, delete: true, export: true },
     permissions: { view: false, create: false, edit: false, delete: false, export: false },
     settings: { view: false, create: false, edit: false, delete: false, export: false },
     system_updater: { view: false, create: false, edit: false, delete: false, export: false },
@@ -83,6 +89,7 @@ export const DEFAULT_ROLE_PERMISSIONS: RolePermissionsMap = {
     sessions: { view: true, create: false, edit: true, delete: false, export: true },
     reports: { view: true, create: false, edit: false, delete: false, export: true },
     users: { view: true, create: false, edit: false, delete: false, export: false },
+    promotions: { view: true, create: false, edit: false, delete: false, export: false },
     permissions: { view: false, create: false, edit: false, delete: false, export: false },
     settings: { view: false, create: false, edit: false, delete: false, export: false },
     system_updater: { view: false, create: false, edit: false, delete: false, export: false },
@@ -93,8 +100,9 @@ export const DEFAULT_ROLE_PERMISSIONS: RolePermissionsMap = {
     exams: { view: true, create: false, edit: false, delete: false, export: false },
     resources: { view: true, create: false, edit: false, delete: false, export: false },
     sessions: { view: true, create: false, edit: false, delete: false, export: false },
-    reports: { view: true, create: false, edit: false, delete: false, export: false },
+    reports: { view: true, create: false, edit: false, delete: false, export: true },
     users: { view: false, create: false, edit: false, delete: false, export: false },
+    promotions: { view: true, create: false, edit: false, delete: false, export: false },
     permissions: { view: false, create: false, edit: false, delete: false, export: false },
     settings: { view: false, create: false, edit: false, delete: false, export: false },
     system_updater: { view: false, create: false, edit: false, delete: false, export: false },
